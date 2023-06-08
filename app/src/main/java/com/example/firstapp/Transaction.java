@@ -43,7 +43,14 @@ public class Transaction extends AppCompatActivity implements SelectListener{
         ad.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(Transaction.this, "Deleted", Toast.LENGTH_SHORT).show();
+                dbHelper db = new dbHelper(Transaction.this);
+                db.deleteEntry(item);
+                List<TransactionList> list = db.getData();
+                recyclerView = findViewById(R.id.list);
+                Log.d("mytag", "onCreate: sending list for display");
+                Collections.reverse(list);
+                recyclerView.setLayoutManager(new LinearLayoutManager(Transaction.this));
+                recyclerView.setAdapter(new myAdapter(getApplicationContext(), list, Transaction.this));
             }
         });
 

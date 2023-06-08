@@ -77,7 +77,6 @@ public class dbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String queryString = "SELECT * FROM " + TRANSACTION_LIST;
         Cursor cursor = db.rawQuery(queryString, null);
-
         if(cursor.moveToFirst()) {
             do {
                 TransactionList item = new TransactionList();
@@ -105,5 +104,49 @@ public class dbHelper extends SQLiteOpenHelper {
         }
         cursor.close();
         return data;
+    }
+    public boolean deleteEntry(TransactionList item) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Delete the item
+        String whereClause = KEY_AMOUNT + " = ? AND " + KEY_DATE + " = ?";
+        String[] whereArgs = { String.valueOf(item.getAmount()), item.getDate() };
+        int rowsDeleted = db.delete(TRANSACTION_LIST, whereClause, whereArgs);
+        Log.d("mytag", "deleteEntry: deleted " + rowsDeleted + " rows");
+
+        int updatedValue = Integer.parseInt(getLastRowData());
+        if (item.getType().equals("add")) {
+            updatedValue += item.getAmount();
+        } else {
+            updatedValue -= item.getAmount();
+        }
+        updateLastEntryOfColumn(KEY_BALANCE,String.valueOf(updatedValue));
+        return rowsDeleted > 0;
+    }
+    public boolean updateLastEntryOfColumn(String columnName, String newValue) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Step 1: Identify the last row
+        String queryLastRow = "SELECT * FROM " + TRANSACTION_LIST + " ORDER BY " + KEY_BALANCE + " DESC LIMIT 1";
+        Cursor cursor = db.rawQuery(queryLastRow, null);
+
+        if (cursor.moveToFirst()) {
+            // Step 2: Update the desired column in the last row
+            int lastRowId = cursor.getInt(cursor.getColumnIndex(KEY_BALANCE));
+
+            ContentValues values = new ContentValues();
+            values.put(columnName, newValue);
+
+            String whereClause = KEY_BALANCE + " = ?";
+            String[] whereArgs = { String.valueOf(lastRowId) };
+
+            int rowsAffected = db.update(TRANSACTION_LIST, values, whereClause, whereArgs);
+            Log.d("mytag", "updateLastEntryOfColumn: updated " + rowsAffected + " rows");
+
+            return rowsAffected > 0;
+        }
+
+        cursor.close();
+        return false;
     }
 }
