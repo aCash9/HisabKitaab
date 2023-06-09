@@ -16,6 +16,7 @@
             android:parentActivityName=".MainActivity" />
         <activity
             android:name=".AddMoney"
+            android:windowSoftInputMode="adjustResize"
             android:exported="false"
             android:parentActivityName=".MainActivity" />
         <activity
