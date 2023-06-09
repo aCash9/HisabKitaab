@@ -108,17 +108,18 @@ public class dbHelper extends SQLiteOpenHelper {
     public boolean deleteEntry(TransactionList item) {
         SQLiteDatabase db = this.getWritableDatabase();
 
+        int updatedValue = Integer.parseInt(getLastRowData());
         // Delete the item
         String whereClause = KEY_AMOUNT + " = ? AND " + KEY_DATE + " = ?";
         String[] whereArgs = { String.valueOf(item.getAmount()), item.getDate() };
         int rowsDeleted = db.delete(TRANSACTION_LIST, whereClause, whereArgs);
         Log.d("mytag", "deleteEntry: deleted " + rowsDeleted + " rows");
 
-        int updatedValue = Integer.parseInt(getLastRowData());
+
         if (item.getType().equals("add")) {
-            updatedValue += item.getAmount();
-        } else {
             updatedValue -= item.getAmount();
+        } else {
+            updatedValue += item.getAmount();
         }
         updateLastEntryOfColumn(KEY_BALANCE,String.valueOf(updatedValue));
         return rowsDeleted > 0;
@@ -147,6 +148,7 @@ public class dbHelper extends SQLiteOpenHelper {
         }
 
         cursor.close();
+        db.close();
         return false;
     }
 }
