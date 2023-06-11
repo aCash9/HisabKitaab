@@ -16,12 +16,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 public class AddMoney extends AppCompatActivity {
     Button button;
     EditText editText;
     EditText editText2;
+    MaterialToolbar app;
 
 
     @Override
@@ -39,6 +43,11 @@ public class AddMoney extends AppCompatActivity {
         button.setEnabled(false);
         editText.addTextChangedListener(watch);
         editText2.addTextChangedListener(watch);
+        app = findViewById(R.id.topAppBar);
+        app.setNavigationOnClickListener(v -> {
+            finish();
+        });
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
